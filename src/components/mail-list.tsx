@@ -9,28 +9,27 @@ import { Mail } from "@/app/data"
 import { useMail } from "@/app/use-mail"
 
 interface MailListProps {
-  items: Mail[]
+  items: Mail[];
+  onMailSelect: (id: string) => void;
+  currentThread?: string;
 }
 
-export function MailList({ items }: MailListProps) {
+export function MailList({ items, onMailSelect, currentThread }: MailListProps) {
   const [mail, setMail] = useMail()
 
   return (
     <ScrollArea className="h-screen">
       <div className="flex flex-col gap-2 p-4 pt-0">
         {items.map((item) => (
-          <button
+          <div
             key={item.id}
+            role="button"
+            onClick={() => onMailSelect(item.id)}
             className={cn(
-              "flex flex-col items-start gap-2 rounded-lg border p-3 text-left text-sm transition-all hover:bg-accent",
-              mail.selected === item.id && "bg-muted"
+              "flex flex-col gap-2 rounded-lg border p-4 cursor-pointer hover:bg-accent",
+              currentThread === item.id && "bg-muted",
+              !item.read && "font-medium"
             )}
-            onClick={() =>
-              setMail({
-                ...mail,
-                selected: item.id,
-              })
-            }
           >
             <div className="flex w-full flex-col gap-1">
               <div className="flex items-center">
@@ -67,7 +66,7 @@ export function MailList({ items }: MailListProps) {
                 ))}
               </div>
             ) : null}
-          </button>
+          </div>
         ))}
       </div>
     </ScrollArea>

@@ -1,44 +1,9 @@
-import { cookies } from "next/headers";
-import Image from "next/image";
+import { redirect } from "next/navigation";
+import { accounts } from "./data";
 
-import { Mail } from "@/components/mail";
-import { accounts, mails } from "./data";
-
-export default async function MailPage() {
-  const cookieStore = await cookies();
-  const layout = cookieStore.get("react-resizable-panels:layout:mail");
-  const collapsed = cookieStore.get("react-resizable-panels:collapsed");
-
-  const defaultLayout = layout ? JSON.parse(layout.value) : undefined;
-  const defaultCollapsed = collapsed ? JSON.parse(collapsed.value) : undefined;
-
-  return (
-    <>
-      <div className="md:hidden">
-        <Image
-          src="/examples/mail-dark.png"
-          width={1280}
-          height={727}
-          alt="Mail"
-          className="hidden dark:block"
-        />
-        <Image
-          src="/examples/mail-light.png"
-          width={1280}
-          height={727}
-          alt="Mail"
-          className="block dark:hidden"
-        />
-      </div>
-      <div className="hidden flex-col md:flex">
-        <Mail
-          accounts={accounts}
-          mails={mails}
-          defaultLayout={defaultLayout}
-          defaultCollapsed={defaultCollapsed}
-          navCollapsedSize={4}
-        />
-      </div>
-    </>
-  );
+export default async function HomePage() {
+  // 获取第一个账户的邮箱用户名作为默认账户
+  const defaultAccount = accounts[0].email.split("@")[0];
+  // 重定向到默认账户的收件箱
+  redirect(`/${defaultAccount}/inbox`);
 }

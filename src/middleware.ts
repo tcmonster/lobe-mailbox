@@ -1,9 +1,16 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
 
-const isProtectedRoute = createRouteMatcher(['/dashboard(.*)', '/forum(.*)', '/'])
+const publicRoutes = [
+  '/favicon.ico',
+  // 添加其他公共路由
+]
+
+// const isProtectedRoute = createRouteMatcher(['/dashboard(.*)', '/forum(.*)', '/'])
+const isPublicRoute = createRouteMatcher(publicRoutes)
 
 export default clerkMiddleware(async (auth, req) => {
-  if (isProtectedRoute(req)) await auth.protect()
+  // if (isProtectedRoute(req)) await auth.protect()
+  if (!isPublicRoute(req)) await auth.protect()
 })
 
 export const config = {
