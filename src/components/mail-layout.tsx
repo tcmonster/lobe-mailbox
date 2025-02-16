@@ -29,7 +29,7 @@ import { AppSidebar } from "./app-sidebar";
 import { Nav } from "./nav";
 
 import { TooltipProvider } from "./ui/tooltip";
-import { Input } from "./ui/input"
+import { Input } from "./ui/input";
 import {
   ResizableHandle,
   ResizablePanel,
@@ -48,6 +48,7 @@ interface MailProps {
   mails: Mail[];
   defaultLayout: number[] | undefined;
   defaultCollapsed?: boolean;
+  defaultScrollPosition: number;
   navCollapsedSize: number;
   currentAccount?: string;
   currentMailbox?: string;
@@ -59,6 +60,7 @@ export function MailLayout({
   mails,
   defaultLayout = [20, 32, 48],
   defaultCollapsed = false,
+  defaultScrollPosition = 0,
   navCollapsedSize,
   currentAccount,
   currentMailbox,
@@ -77,6 +79,12 @@ export function MailLayout({
     },
     [currentAccount, currentMailbox, router]
   );
+
+  // 添加处理 tab 切换的函数
+  const handleTabChange = React.useCallback((value: string) => {
+    // 清除滚动位置 cookie
+    document.cookie = "mail-list-scroll-position=0; path=/; max-age=31536000";
+  }, []);
 
   return (
     <TooltipProvider delayDuration={0}>
@@ -108,16 +116,17 @@ export function MailLayout({
               "min-w-[50px] transition-all duration-300 ease-in-out"
           )}
         >
-          <AppSidebar
-            accounts={accounts}
-            isCollapsed={isCollapsed}
-          />
+          <AppSidebar accounts={accounts} isCollapsed={isCollapsed} />
         </ResizablePanel>
 
         <ResizableHandle withHandle />
 
         <ResizablePanel defaultSize={layout[1]} minSize={15}>
-          <Tabs defaultValue="all">
+          <Tabs
+            defaultValue="all"
+            className="h-full"
+            onValueChange={handleTabChange}
+          >
             <div className="flex items-center px-4 py-2">
               <h1 className="text-xl font-bold">Inbox</h1>
               <TabsList className="ml-auto">
@@ -149,6 +158,7 @@ export function MailLayout({
                 items={mails}
                 onMailSelect={handleMailSelect}
                 currentThread={currentThread}
+                defaultScrollPosition={defaultScrollPosition}
               />
             </TabsContent>
             <TabsContent value="unread" className="m-0">
@@ -156,6 +166,7 @@ export function MailLayout({
                 items={mails.filter((item) => !item.read)}
                 onMailSelect={handleMailSelect}
                 currentThread={currentThread}
+                defaultScrollPosition={defaultScrollPosition}
               />
             </TabsContent>
           </Tabs>
